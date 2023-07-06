@@ -2,6 +2,7 @@ package com.todoapi.todo_api.todo;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class TodoController {
 	private final AtomicLong counter = new AtomicLong();
 
-	ArrayList<Todo> todos = new ArrayList<Todo>();
+	ArrayList<Todo> todos = new ArrayList<Todo>(
+		Arrays.asList(
+			new Todo(
+				counter.incrementAndGet(),
+				"Create a todo",
+				false
+			),
+			new Todo(
+				counter.incrementAndGet(),
+				"Update a todo",
+				false
+			),
+			new Todo(
+				counter.incrementAndGet(),
+				"Delete a todo",
+				false
+			)
+		)
+	);
+
 
 	@GetMapping("/")
 	public ArrayList<Todo> getTodos() {
