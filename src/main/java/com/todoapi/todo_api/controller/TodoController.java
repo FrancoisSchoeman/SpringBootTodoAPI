@@ -1,7 +1,8 @@
 package com.todoapi.todo_api.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.todoapi.todo_api.model.Todo;
-import com.todoapi.todo_api.repository.TodoRepository;
+import com.todoapi.todo_api.service.TodoService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,52 +30,84 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/api/todos")
 @CrossOrigin
 public class TodoController {
-	private final TodoRepository repository;
+	private final TodoService service;
 
-	public TodoController(TodoRepository repository) {
-		this.repository = repository;
+	public TodoController(TodoService service) {
+		this.service = service;
 	}
 
+	@Operation(summary = "Get a list of all todo's.")
 	@GetMapping("")
 	public List<Todo> findAll(){
-		return repository.findAll();
+		return service.findAllTodos();
 	}
 
+	@Operation(summary = "Get a todo by id - add the id to the endpoint.")
 	@GetMapping("/{id}")
 	public Todo findById(@PathVariable Integer id){
-		return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found."));
+		return service.findTodoById(id);
 	}
 
+	@Operation(summary = "Create a todo - pass a json object containing the task inside the request body, eg: {'task': 'Give cat milk!'}.")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("")
-	public void createTodo(@Valid @RequestBody Todo todo){
-		repository.save(todo);
+	public void createTodo(@Valid @RequestBody Map<String, String> request){
+		
+		if(!request.containsKey("task")){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Key 'task' not supplied.");
+		}
+
+		String task = request.get("task");
+
+		if(task.length() == 0){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task cannot be empty.");
+		}
+		service.createTodo(task);
 	}
 
+	@Operation(summary = "Update a todo - pass a json object containing the id and task/isComplete inside the request body, eg: {'id': 1, 'task': 'Give cat less milk!', 'isComplete': true}.")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PutMapping("/{id}")
-	public void updateTodo(@RequestBody Todo todo, @PathVariable Integer id){
+	@PutMapping("")
+	public void updateTodo(@RequestBody Map<String, Object> request){
 
-		if(!repository.existsById(id)){
+		Integer id = (Integer) request.get("id");
+
+		Todo todo = service.findTodoById(id);
+
+		if(request.containsKey("isComplete")){
+        	todo.setIsComplete((Boolean) request.get("isComplete"));
+    	}
+
+		if(request.containsKey("task")){
+			todo.setTask((String) request.get("task"));
+		}
+
+		if(!service.todoExistsById(id)){
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found.");
 		}
 
-		repository.save(todo);
+		todo.setDateUpdated(LocalDateTime.now());
+
+		service.updateTodo(todo);
 	}
 
+	@Operation(summary = "Delete a todo - pass a json object containing the id inside the request body, eg: {'id': 1}.")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@DeleteMapping("/{id}")
-	public void deleteTodo(@PathVariable Integer id){
+	@DeleteMapping("")
+	public void deleteTodo(@RequestBody Map<String, Object> request){
 
-		if(!repository.existsById(id)){
+		Integer id = (Integer) request.get("id");
+
+		if(!service.todoExistsById(id)){
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found.");
 		}
 
-		repository.deleteById(id);
+		service.deleteTodoById(id);
 	}
 
+	@Operation(summary = "Get a list of all todos that are either complete or not - pass a boolean value in the endpoint, eg: true.")
 	@GetMapping("/filter/status/{isComplete}")
 	public List<Todo> findByStatus(@PathVariable Boolean isComplete){
-		return repository.listByIsComplete(isComplete);
+		return service.findTodosByStatus(isComplete);
 	}
 }
