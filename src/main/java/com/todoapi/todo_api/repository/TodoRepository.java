@@ -8,6 +8,8 @@ import com.todoapi.todo_api.model.Todo;
 
 public interface TodoRepository extends ListCrudRepository<Todo, Integer> {
 
+
+    
     @Query(
         """
             SELECT * FROM Todo WHERE is_complete =:isComplete

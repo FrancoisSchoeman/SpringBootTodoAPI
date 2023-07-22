@@ -3,8 +3,10 @@ package com.todoapi.todo_api.model;
 import org.springframework.data.annotation.Id;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Todo {
@@ -19,6 +21,9 @@ public class Todo {
     private LocalDateTime dateCreated;
 
     private LocalDateTime dateUpdated;
+
+    @OneToMany(mappedBy = "todo")
+    private List<Comment> comments;
 
     public Todo() {}
 
@@ -68,5 +73,13 @@ public class Todo {
 
     public void setDateUpdated(LocalDateTime dateUpdated) {
         this.dateUpdated = dateUpdated;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
