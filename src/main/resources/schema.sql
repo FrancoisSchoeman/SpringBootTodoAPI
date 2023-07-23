@@ -6,13 +6,3 @@ CREATE TABLE IF NOT EXISTS Todo(
     date_updated TIMESTAMP,
     PRIMARY KEY (id)
 );
-
-CREATE TABLE IF NOT EXISTS Comment(
-    id INTEGER AUTO_INCREMENT,
-    todo_id INTEGER NOT NULL,
-    comment TEXT NOT NULL,
-    date_created TIMESTAMP NOT NULL,
-    date_updated TIMESTAMP,
-    PRIMARY KEY (id),
-    FOREIGN KEY (todo_id) REFERENCES Todo(id)
-);
