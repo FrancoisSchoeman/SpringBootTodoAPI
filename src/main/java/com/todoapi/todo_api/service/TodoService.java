@@ -28,6 +28,12 @@ public class TodoService {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found."));
     }
 
+    /**
+     * Accepts a Todo object to persist and will return the created object
+     *
+     * @param todo - the Todo object of which only task is used
+     * @return - the created todo object
+     */
     public Todo createTodo(Todo todo){
         try {
             return repository.save(todo);

@@ -48,12 +48,7 @@ public class TodoController {
 		return service.findTodoById(id);
 	}
 
-	/**
-	 * Accepts a JSON object for todo to persist and will return the created object
-	 *
-	 * @param todo - the Todo object ov which only task is used
-	 * @return - the created todo object
-	 */
+
 	@Operation(summary = "Create a todo - pass a json object containing the task inside the request body, eg: {'task': 'Give cat milk!'}.")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("")
