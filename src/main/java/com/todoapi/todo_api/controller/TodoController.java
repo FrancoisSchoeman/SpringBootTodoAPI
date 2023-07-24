@@ -48,21 +48,12 @@ public class TodoController {
 		return service.findTodoById(id);
 	}
 
+
 	@Operation(summary = "Create a todo - pass a json object containing the task inside the request body, eg: {'task': 'Give cat milk!'}.")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("")
-	public void createTodo(@Valid @RequestBody Map<String, String> request){
-		
-		if(!request.containsKey("task")){
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Key 'task' not supplied.");
-		}
-
-		String task = request.get("task");
-
-		if(task.length() == 0){
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task cannot be empty.");
-		}
-		service.createTodo(task);
+	public void createTodo(@Valid @RequestBody Todo todo){
+		service.createTodo(todo);
 	}
 
 	@Operation(summary = "Update a todo - pass a json object containing the id and task/isComplete inside the request body, eg: {'id': 1, 'task': 'Give cat less milk!', 'isComplete': true}.")
