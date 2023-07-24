@@ -34,6 +34,7 @@ class TodoControllerTests {
 		Todo resultTodo = todoService.createTodo(todo);
 
 		Assertions.assertEquals("test2", resultTodo.getTask());
+		Assertions.assertEquals(false, resultTodo.getIsComplete());
 	}
 
 }

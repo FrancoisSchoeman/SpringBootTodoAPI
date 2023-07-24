@@ -1,8 +1,6 @@
 package com.todoapi.todo_api.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.todoapi.todo_api.model.Todo;
 import com.todoapi.todo_api.service.TodoService;
@@ -59,41 +56,15 @@ public class TodoController {
 	@Operation(summary = "Update a todo - pass a json object containing the id and task/isComplete inside the request body, eg: {'id': 1, 'task': 'Give cat less milk!', 'isComplete': true}.")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PutMapping("")
-	public void updateTodo(@RequestBody Map<String, Object> request){
-
-		Integer id = (Integer) request.get("id");
-
-		Todo todo = service.findTodoById(id);
-
-		if(request.containsKey("isComplete")){
-        	todo.setIsComplete((Boolean) request.get("isComplete"));
-    	}
-
-		if(request.containsKey("task")){
-			todo.setTask((String) request.get("task"));
-		}
-
-		if(!service.todoExistsById(id)){
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found.");
-		}
-
-		todo.setDateUpdated(LocalDateTime.now());
-
+	public void updateTodo(@Valid @RequestBody Todo todo){
 		service.updateTodo(todo);
 	}
 
 	@Operation(summary = "Delete a todo - pass a json object containing the id inside the request body, eg: {'id': 1}.")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("")
-	public void deleteTodo(@RequestBody Map<String, Object> request){
-
-		Integer id = (Integer) request.get("id");
-
-		if(!service.todoExistsById(id)){
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "To do not found.");
-		}
-
-		service.deleteTodoById(id);
+	public void deleteTodo(@Valid @RequestBody Todo todo){
+		service.deleteTodoById(todo.getId());
 	}
 
 	@Operation(summary = "Get a list of all todos that are either complete or not - pass a boolean value in the endpoint, eg: true.")
